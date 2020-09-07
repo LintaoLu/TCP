@@ -56,7 +56,7 @@ void StreamReassembler::merge(size_t start, size_t end, string &data) {
         string& str1(interval1->second.second), str2(interval2->second.second);
         string sub1(str1.substr(0, start - interval1->first));
         if (interval2->second.first > end) {
-            data += str2.substr(str2.size() - (interval2->second.first - end) + 1);
+            data += str2.substr(str2.size() - (interval2->second.first - end));
         }
         for (auto it = interval1; it != interval_tree.end(); it++) {
             _size -= it->second.second.size();
