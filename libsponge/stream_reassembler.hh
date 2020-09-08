@@ -12,8 +12,8 @@
 class StreamReassembler {
   private:
     // Your code here -- add private members as essary.
-    size_t offset, _size;
-    std::map<size_t, std::pair<size_t, std::string&>> interval_tree;
+    size_t offset, total_size, end_index;
+    std::map<size_t, std::pair<size_t, std::string>> interval_tree;
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
     void merge(size_t start, size_t end, std::string &data);
