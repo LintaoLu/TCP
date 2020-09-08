@@ -93,7 +93,8 @@ void StreamReassembler::merge(size_t start, size_t end, string &data) {
         data = sub + data;
         interval_tree.insert({left, pair<size_t, string>(right, data)});
     } else if (interval2 != interval_tree.end() && interval2->first <= end && interval2->second.first > start) {
-        interval1 = interval1->first > start ? interval_tree.begin() : interval_tree.upper_bound(interval1->first);
+        interval1 = (interval1 == interval_tree.end() ||
+                     interval1->first > start) ? interval_tree.begin() : interval_tree.upper_bound(interval1->first);
         string& str2(interval2->second.second);
         if (interval2->second.first > end) {
             data += str2.substr(str2.size() - (interval2->second.first - end));
