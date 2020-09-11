@@ -33,7 +33,8 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // Generate a valid string.
     string str(data);
     if (index < offset) str = str.substr(offset - index);
-    size_t remains = _capacity - total_size;
+    // remains = total capacity - all unassembled bytes - all bytes in byte stream
+    size_t remains = _capacity - unassembled_bytes() - _output.buffer_size();
     if (remains < data.size()) str = str.substr(0, remains);
     merge(max(offset, index), max(offset, index) + str.size(), str);
     auto begin = interval_tree.begin();
