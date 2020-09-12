@@ -1,7 +1,5 @@
 #include "wrapping_integers.hh"
 
-#include <iostream>
-
 // Dummy implementation of a 32-bit wrapping integer
 
 // For Lab 2, please replace with a real implementation that passes the
@@ -34,7 +32,7 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
 //! has a different ISN.
 uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     uint64_t max_len(1ll << 32);
-    uint64_t offset((n.raw_value() - isn.raw_value() + max_len) % max_len);
+    uint64_t offset((n - isn + max_len) % max_len);
     uint32_t coefficient(checkpoint / max_len);
     uint64_t res1(coefficient * max_len + offset);
     uint64_t res2((coefficient + 1) * max_len + offset);
