@@ -34,6 +34,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     size_t window(_capacity - _output.buffer_size());
     size_t remains(min(end, window + offset) - max(index, offset));
     string str(data.substr(max(index, offset) - index, remains));
+    if (str.empty()) return;
     merge(max(offset, index), max(offset, index) + str.size(), str);
     auto begin = interval_tree.begin();
     if (begin != interval_tree.end() && begin->first == offset) {
