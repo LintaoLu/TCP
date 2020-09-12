@@ -49,6 +49,8 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 
 //! end is always greater than start
 void StreamReassembler::merge(size_t start, size_t end, string &data) {
+    if (end == start) return;
+
     // Since I used --upper_bound() method, must handle empty tree at very beginning!
     // Otherwise --upper_bound() method will throw segmentation error!
     // I don't know if there are other way to handle this error. Will check it later.
