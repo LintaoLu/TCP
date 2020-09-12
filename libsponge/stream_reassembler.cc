@@ -37,8 +37,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     //! This two checks are very important! Be careful about the input range!
     //! Input shouldn't be push to interval tree as long as it has enough capacity!
     //! Only allows substring that between [offset, offset + reassembler's size)
-    str = str.substr(0, min(end, offset + remains) - index);
-    str = str.substr(max(index, offset) - index);
+    str = str.substr(max(index, offset) - index, min(end, offset + remains) - index);
     merge(max(offset, index), max(offset, index) + str.size(), str);
     auto begin = interval_tree.begin();
     if (begin != interval_tree.end() && begin->first == offset) {
