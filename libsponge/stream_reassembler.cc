@@ -31,14 +31,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     }
     if (end <= offset) return;
     // Generate a valid string.
-    string str(data);
-    // remains = total capacity - all unassembled bytes - all bytes in byte stream
-    size_t remains(_capacity - _output.buffer_size());
-    //! This two checks are very important! Be careful about the input range!
-    //! Input shouldn't be push to interval tree as long as it has enough capacity!
-    //! Only allows substring that between [offset, offset + reassembler's size)
-    str = str.substr(max(index, offset) - index, min(end, offset + remains) - index);
-    if (str.empty()) return;
+    size_t window(_capacity - _output.buffer_size());
+    size_t remains(min(end, window + offset) - max(index, offset));
+    string str(data.substr(max(index, offset) - index, remains));
     merge(max(offset, index), max(offset, index) + str.size(), str);
     auto begin = interval_tree.begin();
     if (begin != interval_tree.end() && begin->first == offset) {
