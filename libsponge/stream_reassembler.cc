@@ -15,7 +15,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity)
-    : offset(0), total_size(0), end_index(capacity+1), interval_tree(), _output(capacity), _capacity(capacity) {}
+    : offset(0), total_size(0), end_index(1ll<<63), interval_tree(), _output(capacity), _capacity(capacity) {}
 
 //! \details This function accepts a substring (aka a segment) of bytes,
 //! possibly out-of-order, from the logical stream, and assembles any newly
@@ -32,10 +32,13 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     if (end <= offset) return;
     // Generate a valid string.
     string str(data);
-    if (index < offset) str = str.substr(offset - index);
     // remains = total capacity - all unassembled bytes - all bytes in byte stream
-    size_t remains = _capacity - unassembled_bytes() - _output.buffer_size();
-    if (remains < data.size()) str = str.substr(0, remains);
+    size_t remains(_capacity - _output.buffer_size());
+    //! This two checks are very important! Be careful about the input range!
+    //! Input shouldn't be push to interval tree as long as it has enough capacity!
+    //! Only allows substring that between [offset, offset + reassembler's size)
+    str = str.substr(0, min(end, offset + remains) - index);
+    str = str.substr(max(index, offset) - index);
     merge(max(offset, index), max(offset, index) + str.size(), str);
     auto begin = interval_tree.begin();
     if (begin != interval_tree.end() && begin->first == offset) {
@@ -45,7 +48,6 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         offset = begin->second.first;
         _output.write(temp);
     }
-
     if (offset == end_index) _output.end_input();
 }
 
@@ -115,3 +117,5 @@ void StreamReassembler::merge(size_t start, size_t end, string &data) {
 size_t StreamReassembler::unassembled_bytes() const { return total_size - _output.bytes_written(); }
 
 bool StreamReassembler::empty() const { return total_size - _output.bytes_written() == 0; }
+
+size_t StreamReassembler::get_offset() const { return offset; }
