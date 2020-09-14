@@ -37,7 +37,7 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     uint64_t res1(coefficient * max_len + offset);
     uint64_t res2((coefficient + 1) * max_len + offset);
     if (checkpoint % max_len == 0) {
-        res2 = (coefficient - 1) * max_len + offset;
+        res2 = (coefficient == 0 ? 0 : coefficient - 1) * max_len + offset;
     }
     // abs() is not working since uint64_t a - uint64_t b is always a positive number
     // even a is smaller than b

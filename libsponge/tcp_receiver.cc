@@ -20,7 +20,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     }
     if (!SYN) return false;
     // update checkpoint
-    if (_reassembler.get_offset() != 0 && _reassembler.get_offset() % (1ll << 32) == 0) {
+    if (_reassembler.get_offset() == checkpoint + (1ll << 32)) {
         checkpoint += 1ll << 32;
     }
     // window range [start, end) is represent by stream index
