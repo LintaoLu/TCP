@@ -29,8 +29,16 @@ class TCPSender {
     //! outgoing stream of bytes that have not yet been sent
     ByteStream _stream;
 
-    //! the (absolute) sequence number for the next byte to be sent
-    uint64_t _next_seqno{0};
+    //! curr_seqno is absolute index that
+    uint64_t _next_seqno{0}, _checkpoint{0}, byte_flight{0};
+
+    //! a queue of segments that the TCPSender has been send
+    std::queue<TCPSegment> outstanding_buffer{};
+    unsigned int current_retransmission_timeout, alarm_time{0}, consecutive_transmission{0};
+    uint16_t current_window{1};
+    bool closed;
+    void load_segments();
+
 
   public:
     //! Initialize a TCPSender
