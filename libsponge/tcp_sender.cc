@@ -72,7 +72,7 @@ void TCPSender::fill_window() {
 bool TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
     uint64_t ack_seqno(unwrap(ackno, _isn, _checkpoint));
     if (ack_seqno > _next_seqno) return false;
-    // Rest RTO to initial value.
+    // Reset RTO to initial value.
     current_retransmission_timeout = _initial_retransmission_timeout;
     alarm_time = 0;
     // Reset consecutive transmission to 0.

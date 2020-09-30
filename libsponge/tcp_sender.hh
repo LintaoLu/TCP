@@ -37,7 +37,6 @@ class TCPSender {
     unsigned int current_retransmission_timeout, alarm_time{0}, consecutive_transmission{0};
     uint16_t current_window{1};
     bool closed;
-    void load_segments();
 
 
   public:
