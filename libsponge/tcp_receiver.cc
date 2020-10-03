@@ -28,6 +28,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
     // calculate absolute indices for the segment
     size_t seg_start(unwrap(seg.header().seqno, ISN, checkpoint));
     size_t seg_end(unwrap(seg.header().seqno + seg.length_in_sequence_space(), ISN, checkpoint));
+    if (seg_start == 0 && !seg.header().syn) return false;
     // calculate stream indices
     if (seg_start != 0) {
         seg_start--;
