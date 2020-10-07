@@ -116,3 +116,7 @@ void TCPSender::send_empty_segment() {
     segment.payload() = string("");
     segments_out().emplace(segment);
 }
+
+uint64_t TCPSender::get_unwrapped_no(WrappingInt32 n) const {
+    return unwrap(n, _isn, _checkpoint);
+}
