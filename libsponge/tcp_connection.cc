@@ -31,9 +31,11 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         terminate_connection();
         return;
     }
-    _receiver.segment_received(seg);
-    // Passive close. If both byte stream end, no need to linger.
-    if (_receiver.stream_out().input_ended() && !_sender.stream_in().input_ended()) {
+    const bool seg_received = _receiver.segment_received(seg);
+    // POS side send fin -> PAS side receives it and send data seg with ack -> POS confirm data seg send ack
+    // -> PAS set _linger_after_streams_finish to false which means no need wait.
+    // Passive side should acceptable ack (valid) before setting _linger_after_streams_finish.
+    if (seg_received && _receiver.stream_out().input_ended() && !_sender.stream_in().input_ended()) {
          _linger_after_streams_finish = false;
     }
     if (header.ack) {
@@ -82,8 +84,8 @@ bool TCPConnection::active() const {
 }
 
 size_t TCPConnection::write(const string &data) {
-    size_t bytes_written(min(remaining_outbound_capacity(), data.size()));
-    _sender.stream_in().write(data);
+    size_t bytes_written = _sender.stream_in().write(data);
+    _sender.fill_window();
     add_ack_and_send_out();
     return bytes_written;
 }
@@ -91,7 +93,7 @@ size_t TCPConnection::write(const string &data) {
 //! \param[in] ms_since_last_tick number of milliseconds since the last call to this method
 void TCPConnection::tick(const size_t ms_since_last_tick) {
     // Throw error if too many repeated transmission.
-    if (_sender.consecutive_retransmissions() > TCPConfig::MAX_RETX_ATTEMPTS) {
+    if (_sender.consecutive_retransmissions() >= TCPConfig::MAX_RETX_ATTEMPTS) {
         terminate_connection(true);
         return;
     }
@@ -132,6 +134,8 @@ void TCPConnection::terminate_connection(bool send) {
     if (!send) return;
     if (_sender.segments_out().empty()) _sender.send_empty_segment();
     TCPSegment &seg = _sender.segments_out().front();
+    // Should ignore all outstanding bytes.
+    seg.header().seqno = seg.header().seqno - bytes_in_flight();
     seg.header().rst = true;
     _segments_out.emplace(seg);
     _sender.segments_out().pop();
