@@ -32,7 +32,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         return;
     }
     _receiver.segment_received(seg);
-    // Passive connection. 
+    // Passive close. If both byte stream end, no need to linger.
     if (_receiver.stream_out().input_ended() && !_sender.stream_in().input_ended()) {
          _linger_after_streams_finish = false;
     }
