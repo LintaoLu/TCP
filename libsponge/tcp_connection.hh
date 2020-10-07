@@ -21,6 +21,16 @@ class TCPConnection {
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
 
+    size_t last_segment_received_time{0};
+    std::optional<uint64_t> last_ackno{};
+
+    //! This method tries to use already existed segment and let them carry ack information.
+    //! If no already existed segment, it generate a new one.
+    //! This method also load all segment to segment out queue.
+    void add_ack_and_send_out();
+
+    void terminate_connection(bool send = false);
+
   public:
     //! \name "Input" interface for the writer
     //!@{
